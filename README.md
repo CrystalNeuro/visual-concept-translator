@@ -17,7 +17,7 @@ We test our method on both Nvidia A30 and A100 GPU. However, it should work in a
 
 ## Usage
 To use the VCT to image-to-image tasks, please run
-
+```
 accelerate launch main.py \
     --concept_image_dir="./examples/concept_image" \
     --content_image_dir="./examples/content_image" \
@@ -28,7 +28,7 @@ accelerate launch main.py \
     --cross_attention_injection_ratio=0.2 \
     --self_attention_injection_ratio=0.9 \
     --use_l1
-
+```
 Please put your one-shot concept image into `concept_image_dir`, and any number of content images into `content_image_dir`. The translated images will be saved in `output_image_path`.
 
 The `initializer_token` is used as the beginning of concept embeddings. The `max_train_steps` defines the training steps. For different concept, the optimal training step is also different, so you can adjust the `max_train_steps` to generate better results (always between 100 to 1000).
