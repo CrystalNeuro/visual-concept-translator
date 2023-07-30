@@ -24,7 +24,7 @@ To use the VCT to image-to-image tasks, please run
 accelerate launch main.py \
     --concept_image_dir="./examples/concept_image" \
     --content_image_dir="./examples/content_image" \
-    --output_image_path="./output_try6s" \
+    --output_image_path="./outputs" \
     --initializer_token="girl" \
     --max_train_steps=500 \
     --concept_embedding_num=3 \
