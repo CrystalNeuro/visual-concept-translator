@@ -76,7 +76,7 @@ def get_out_img_path(out_path, input_img_path):
 
 
 
-def main(model_id, image_path, step_list, prompt_name_backward, forward_prompt, backward_prompts, out_img_save_path, content_name_pre, cross_attention_injection_ratio, self_attention_injection_ratio):
+def main(model_id, image_path, step_list, prompt_name_backward, forward_prompt, backward_prompts, out_img_save_path, content_name_pre, cross_attention_injection_ratio, self_attention_injection_ratio, pretrained_model_name_or_path):
     
     #out_path = os.path.join(model_id, "vsiual_imgs")
     #if not os.path.exists(out_path):
@@ -87,8 +87,8 @@ def main(model_id, image_path, step_list, prompt_name_backward, forward_prompt, 
     output_img_list = []
     third_img_list = []
     
-    pipe = ddim_inversion.DDIMStableDiffusionPipeline.from_pretrained("/home/liuzuhao/stable-diffusion-v1-5")
-    pipe.scheduler = DDIMScheduler.from_config("/home/liuzuhao/stable-diffusion-v1-5/scheduler")
+    pipe = ddim_inversion.DDIMStableDiffusionPipeline.from_pretrained(pretrained_model_name_or_path)
+    pipe.scheduler = DDIMScheduler.from_config(os.path.join(pretrained_model_name_or_path, "scheduler"))
     pipe = pipe.to("cuda")
     
     for train_step in step_list:
@@ -99,15 +99,15 @@ def main(model_id, image_path, step_list, prompt_name_backward, forward_prompt, 
         backward_embeds_dict_path = os.path.join(model_id, backward_embeds_dict_name)
         backward_learned_embeds_dict = torch.load(backward_embeds_dict_path)
         
-        text_encoder = CLIPTextModel.from_pretrained("/home/liuzuhao/stable-diffusion-v1-5", subfolder="text_encoder", revision=False)
-        tokenizer = MultiTokenCLIPTokenizer.from_pretrained("/home/liuzuhao/stable-diffusion-v1-5", subfolder="tokenizer")
+        text_encoder = CLIPTextModel.from_pretrained(pretrained_model_name_or_path, subfolder="text_encoder", revision=False)
+        tokenizer = MultiTokenCLIPTokenizer.from_pretrained(pretrained_model_name_or_path, subfolder="tokenizer")
         
         load_multitoken_tokenizer(tokenizer, text_encoder, backward_learned_embeds_dict, backward_placeholder_token)
         
         
         
         scheduler = DDIMScheduler(beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear", clip_sample=False, set_alpha_to_one=False)
-        ldm_stable = StableDiffusionPipeline.from_pretrained("/home/liuzuhao/stable-diffusion-v1-5", scheduler=scheduler, tokenizer=tokenizer, text_encoder=text_encoder).to("cuda")
+        ldm_stable = StableDiffusionPipeline.from_pretrained(pretrained_model_name_or_path, scheduler=scheduler, tokenizer=tokenizer, text_encoder=text_encoder).to("cuda")
         
         ldm_stable.safety_checker = lambda images, clip_input: (images, False)
         inversion = Inversion(ldm_stable)
@@ -194,7 +194,7 @@ def get_image_file(path):
     return img_files[0]
 
 
-def inversion(model_id, content_img_path, out_path_base, train_img_path, train_step, cross_attention_injection_ratio, self_attention_injection_ratio):
+def inversion(model_id, content_img_path, out_path_base, train_img_path, train_step, cross_attention_injection_ratio, self_attention_injection_ratio, pretrained_model_name_or_path):
     """
     Implement multi-concept inversion.
     Args:
@@ -213,6 +213,6 @@ def inversion(model_id, content_img_path, out_path_base, train_img_path, train_s
             forward_prompt = ""
             backward_prompts = ["", "<s2>"]
             step_list = [train_step]
-            main(model_id, input_img_path, step_list, prompt_name_backward, forward_prompt, backward_prompts, out_img_save_path, content_name_prefix, cross_attention_injection_ratio, self_attention_injection_ratio)
+            main(model_id, input_img_path, step_list, prompt_name_backward, forward_prompt, backward_prompts, out_img_save_path, content_name_prefix, cross_attention_injection_ratio, self_attention_injection_ratio, pretrained_model_name_or_path)
     return 0
             

@@ -827,7 +827,7 @@ def multi_concept_inversion():
 if __name__ == "__main__":
     
     args = multi_concept_inversion()
-    pivot_turning_inversion.inversion(args.output_dir, args.content_image_dir, args.output_image_path, args.concept_image_dir, args.max_train_steps, args.cross_attention_injection_ratio, args.self_attention_injection_ratio)
+    pivot_turning_inversion.inversion(args.output_dir, args.content_image_dir, args.output_image_path, args.concept_image_dir, args.max_train_steps, args.cross_attention_injection_ratio, args.self_attention_injection_ratio, args.pretrained_model_name_or_path)
 
 
 
